@@ -3220,16 +3220,8 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   });
 
   function defaultShortcuts(){
-    return [
-      { name:'深技大教务',      url:'https://jwxt.sztu.edu.cn' },
-      { name:'学生邮箱',        url:'https://mail.stumail.sztu.edu.cn' },
-      { name:'SZTU OJ',        url:'https://acm.sztu.edu.cn' },
-      { name:'Google AI Studio', url:'https://aistudio.google.com' },
-      { name:'ChatGPT',        url:'https://chatgpt.com' },
-      { name:'Gemini',         url:'https://gemini.google.com' },
-      { name:'GitHub',         url:'https://github.com' },
-      { name:'Hello 算法',     url:'https://www.hello-algo.com' },
-    ].map(s => ({ id:uid(), ...s }));
+    // 定制版首次打开保持空白：用户自己决定主页上固定哪些入口。
+    return [];
   }
 
   let shortcuts = (() => {
@@ -3812,13 +3804,6 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   function defaultVault(){
     const f = (name, items) => ({ id:uid(), name, items: items.map(([n, u]) => ({ id:uid(), name:n, url:u })) });
     return { folders: [
-      f('校园事务', [
-        ['教务系统',   'https://jwxt.sztu.edu.cn'],
-        ['学生邮箱',   'https://mail.stumail.sztu.edu.cn'],
-        ['SZTU OJ',    'https://acm.sztu.edu.cn'],
-        ['图书馆',     'https://lib.sztu.edu.cn'],
-        ['信息门户',   'https://i.sztu.edu.cn'],
-      ]),
       f('常用开发', [
         ['GitHub',         'https://github.com'],
         ['Hello 算法',     'https://www.hello-algo.com'],
