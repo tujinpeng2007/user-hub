@@ -1,0 +1,22 @@
+# 隐私隔离：默认不提交任何本地文件，仅显式放行发布白名单。
+*
+!.gitignore
+!README.md
+!index_to_user.html
+!dist/
+!dist/**
+
+# 排除自用主版本
+/index.html
+
+# 常见系统与依赖缓存
+node_modules/
+.DS_Store
+*.log
+
+# 本地编辑器、备份与个人工作目录
+.codeartsdoer/
+备份1/
+备份2/
+outputs/
+work/
