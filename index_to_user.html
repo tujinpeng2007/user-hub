@@ -267,12 +267,18 @@ html.dark-mode .drop-tray-clear{ color:#7f90a5; }html.dark-mode .drop-tray-clear
 .drop-p2p-address input:focus{ border-color:var(--grass); }
 .drop-p2p-note{ margin-top:10px; color:#64748b; font-size:10.5px; line-height:1.7; }
 .drop-p2p-route{ margin:-5px 0 12px; color:#64748b; font-size:10.5px; text-align:center; line-height:1.7; }
-.drop-p2p-turn{ margin-top:15px; border-top:1px solid var(--line); padding-top:12px; }
-.drop-p2p-turn summary{ color:var(--ink-mid); font-size:11.5px; cursor:pointer; }
-.drop-p2p-turn label{ display:block; margin-top:10px; color:var(--ink-mid); font-size:11px; }
-.drop-p2p-turn input,.drop-p2p-turn textarea{ display:block; width:100%; margin-top:5px; padding:8px; border:1px solid var(--line); border-radius:8px; background:rgba(241,245,249,.6); color:var(--ink); font:11px/1.6 var(--font-mono); outline:none; }
-.drop-p2p-turn textarea{ resize:vertical; min-height:60px; }.drop-p2p-turn input:focus,.drop-p2p-turn textarea:focus{ border-color:var(--grass); }
-.drop-p2p-turn .drop-p2p-note a{ color:inherit; text-decoration:underline; }
+.drop-p2p-host-send{ margin-top:15px; padding-top:15px; border-top:1px solid var(--line); }
+.drop-p2p-host-send[hidden]{ display:none; }
+.drop-p2p-host-send .drop-p2p-text{ min-height:110px; font-size:12px; }
+.drop-p2p-host-send h3,.drop-p2p-inbox h3{ margin:0 0 12px; font-size:12px; color:var(--ink); font-weight:600; }
+.drop-p2p-inbox{ margin-top:20px; padding-top:16px; border-top:1px solid var(--line); }
+.drop-p2p-inbox-item{ margin-top:9px; padding:12px; border:1px solid var(--line); border-radius:12px; background:rgba(148,163,184,.07); }
+.drop-p2p-inbox-item pre{ margin:0 0 9px; max-height:160px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; user-select:text; -webkit-user-select:text; color:var(--ink); font:12px/1.7 var(--font-mono); }
+.drop-p2p-inbox-item img{ display:block; max-width:100%; max-height:180px; border-radius:8px; margin-bottom:9px; }
+.drop-p2p-inbox-item strong{ display:block; overflow-wrap:anywhere; color:var(--ink); font-size:12px; margin-bottom:8px; }
+.drop-p2p-inbox-item small{ color:var(--ink-mid); display:block; margin-bottom:8px; }
+.drop-p2p-qr.paired{ width:auto; height:auto; padding:0; border:0; background:none; box-shadow:none; margin:12px 0; }
+.drop-p2p-qr.paired svg{ display:none; }.drop-p2p-qr.paired::after{ content:'已配对，无需再次扫码'; color:var(--ink-mid); font-size:11px; }
 .drop-p2p-mobile-card .drop-p2p-route{ text-align:left; margin-top:-12px; }
 .drop-p2p-actions{ display:flex; justify-content:center; gap:8px; margin-top:16px; }
 .drop-p2p-btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:34px; padding:0 12px; border:1px solid var(--line); border-radius:9px; background:rgba(248,250,252,.8); color:var(--ink-mid); font:600 11.5px 'Segoe UI','PingFang SC',sans-serif; cursor:pointer; }
@@ -315,7 +321,7 @@ html.dark-mode .drop-p2p-sub,html.dark-mode .drop-p2p-note,html.dark-mode .drop-
 html.dark-mode .drop-p2p-status{ color:#fbbf24; }html.dark-mode .drop-p2p-status[data-state="connected"]{ color:#a6e7b5; }
 html.dark-mode .drop-p2p-status[data-state="connected"] .drop-p2p-status-dot{ background:#73cc8c; }
 html.dark-mode .drop-p2p-status[data-state="error"],html.dark-mode .drop-p2p-feedback.error{ color:#ffb2aa; }
-html.dark-mode .drop-p2p-address input,html.dark-mode .drop-p2p-turn input,html.dark-mode .drop-p2p-turn textarea,html.dark-mode .drop-p2p-progress,html.dark-mode .drop-p2p-text,html.dark-mode .drop-p2p-picker{ background:rgba(15,23,42,.65); }
+html.dark-mode .drop-p2p-address input,html.dark-mode .drop-p2p-progress,html.dark-mode .drop-p2p-text,html.dark-mode .drop-p2p-picker{ background:rgba(15,23,42,.65); }
 html.dark-mode .drop-p2p-tabs{ background:rgba(255,255,255,.055); }html.dark-mode .drop-p2p-tabs button{ color:#c5d1df; }html.dark-mode .drop-p2p-tabs button[aria-selected="true"]{ background:#26364a; color:#a6e7b5; }
 html.dark-mode .drop-pill .dp-source{ color:#95cfa6; }
 @media (prefers-reduced-motion:reduce){ .drop-p2p-status-dot{ animation:none!important; }.drop-p2p-ring .fill{ transition:none; } }
@@ -1779,11 +1785,19 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   <section class="drop-p2p-card" role="dialog" aria-modal="true" aria-labelledby="dropP2pTitle">
     <button class="drop-p2p-close" id="dropP2pClose" type="button" aria-label="关闭浮窗"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
     <h2 class="drop-p2p-title" id="dropP2pTitle">跨端极速快传</h2>
-    <p class="drop-p2p-sub">P2P 直连优先 · 可配置加密中继兜底<br>免登录 · 传文本 / 原图 / 文件</p>
+    <p class="drop-p2p-sub">手机相机或微信扫一扫 · 打开链接即可配对<br>电脑与手机双向互传 · 无需账号或配置</p>
     <div class="drop-p2p-qr" id="dropP2pQr"><span class="drop-p2p-qr-placeholder">正在准备配对</span></div>
     <div class="drop-p2p-session" id="dropP2pSession"></div>
     <div class="drop-p2p-status" id="dropP2pHostStatus" data-state="waiting" role="status"><span class="drop-p2p-status-dot" aria-hidden="true"></span><span>等待扫码配对…</span></div>
-    <p class="drop-p2p-route" id="dropP2pHostRoute">未配置中继，仅尝试 P2P 直连</p>
+    <p class="drop-p2p-route" id="dropP2pHostRoute">正在准备安全连接</p>
+    <div class="drop-p2p-host-send" id="dropP2pHostSend" hidden>
+      <h3>发送到已配对的手机</h3>
+      <textarea class="drop-p2p-text" id="dropP2pHostText" spellcheck="false" placeholder="输入或粘贴文本、代码" aria-label="发送到手机的文本"></textarea>
+      <div class="drop-p2p-actions"><button class="drop-p2p-btn primary" id="dropP2pHostSendText" type="button" data-p2p-send disabled>发送文本</button><button class="drop-p2p-btn" id="dropP2pHostPickFiles" type="button">选择照片 / 文件</button></div>
+      <input id="dropP2pHostFilesInput" type="file" multiple hidden><div class="drop-p2p-file-list" id="dropP2pHostFilesList"></div>
+      <div class="drop-p2p-actions"><button class="drop-p2p-btn" id="dropP2pHostSendFiles" type="button" data-p2p-send disabled>发送所选文件</button><button class="drop-p2p-btn" id="dropP2pHostCancel" type="button" disabled>取消传输</button></div>
+      <div class="drop-p2p-feedback" id="dropP2pHostFeedback" role="status" aria-live="polite"></div>
+    </div>
     <div class="drop-p2p-progress" id="dropP2pHostProgress" hidden>
       <div class="drop-p2p-ring"><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="track" cx="24" cy="24" r="20"/><circle class="fill" cx="24" cy="24" r="20"/></svg><span>0%</span></div>
       <div class="drop-p2p-progress-copy"><strong>等待接收</strong><small></small></div>
@@ -1794,15 +1808,7 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
       <p class="drop-p2p-note">本地文件与 localhost 地址无法由手机访问。请填写已经托管的同一份 HTML 地址，或从局域网网页地址打开本页。</p>
     </div>
     <div class="drop-p2p-actions"><button class="drop-p2p-btn" id="dropP2pRetry" type="button">重新配对</button><button class="drop-p2p-btn" id="dropP2pStop" type="button">结束会话</button></div>
-    <details class="drop-p2p-turn" id="dropP2pTurnSettings">
-      <summary>中继设置</summary>
-      <label for="dropP2pTurnUrls">TURN 地址（最多三行）<textarea id="dropP2pTurnUrls" maxlength="280" spellcheck="false" placeholder="turn:服务器:3478&#10;turns:服务器:443?transport=tcp"></textarea></label>
-      <label for="dropP2pTurnUsername">用户名<input id="dropP2pTurnUsername" maxlength="128" autocomplete="off" spellcheck="false"></label>
-      <label for="dropP2pTurnCredential">访问密码<input id="dropP2pTurnCredential" type="password" maxlength="128" autocomplete="off"></label>
-      <div class="drop-p2p-actions"><button class="drop-p2p-btn" id="dropP2pTurnSave" type="button">应用并重新配对</button><button class="drop-p2p-btn" id="dropP2pTurnClear" type="button">移除中继</button></div>
-      <p class="drop-p2p-note">仅存本机浏览器，不写入站点代码。二维码会将这些访问凭据分享给本次配对手机，请勿公开二维码或填写管理 API Key。可从 <a href="https://www.metered.ca/tools/openrelay/" target="_blank" rel="noopener noreferrer">Open Relay 官方服务</a> 获取凭据；流量与费用由服务商规定。</p>
-    </details>
-    <p class="drop-p2p-note">关闭浮窗后仍可接收。配置可用 TURN 后，直连受阻时可自动使用端到端加密中继；未配置时仅尝试直连。浏览器可能要求确认下载，也可点击托盘文件再次保存。</p>
+    <p class="drop-p2p-note">两端保持联网和页面打开。优先直连，失败后自动尝试端到端加密转发。直连单文件上限 1 GB；共享公共转发限 20 MB 并限速，不保证长期可用。二维码是本次配对密钥，请勿公开。</p>
   </section>
 </div>
 <main class="drop-p2p-mobile" id="dropP2pMobile" hidden>
@@ -1835,9 +1841,10 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
       <div class="drop-p2p-progress-copy"><strong>准备发送</strong><small></small></div><button class="drop-p2p-btn" id="dropP2pCancel" type="button">取消</button>
     </div>
     <div class="drop-p2p-feedback" id="dropP2pFeedback" role="status" aria-live="polite"></div>
+    <section class="drop-p2p-inbox" id="dropP2pInbox" aria-live="polite"><h3>来自电脑的收件箱</h3><div id="dropP2pInboxList"><p class="drop-p2p-note">收到的文本、照片和文件会显示在这里</p></div></section>
     <div class="drop-p2p-actions"><button class="drop-p2p-btn" id="dropP2pReconnect" type="button">重新连接</button></div>
   </section>
-  <p class="drop-p2p-note">请保持两端页面打开。同一局域网下通常更快；电脑已配置可用 TURN 时可尝试加密中继。单文件上限 1 GB，文本上限 8 MB，大文件接收会占用电脑内存。发送完成以电脑接收确认为准。</p>
+  <p class="drop-p2p-note" id="dropP2pMobileNote">请保持两端联网和页面打开。直连支持 1 GB 文件，加密公共转发支持 20 MB 文件并限速；文本上限 8 MB。微信若不支持选文件、复制或保存，请点右上角菜单，在浏览器中打开此链接。手机收件箱仅本次页面有效，请及时保存。</p>
 </main>
 <script>
 (() => {
@@ -4992,34 +4999,21 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   const $ = id => document.getElementById(id);
   const mobile = document.documentElement.classList.contains('drop-p2p-mobile-route');
   const CHUNK = 32768, WINDOW = 8, MAX_FILE = 1024 * 1024 * 1024, MAX_TEXT = 8 * 1024 * 1024;
-  const MAGIC = 0x544a5031, PROTOCOL = 'tjp-drop-1';
-  /* 中继配置独立保存在本机；不把私人服务器凭据硬编码进公共 HTML。
-     分享到手机的凭据只置于 URL fragment，不发送给网页托管服务器。
-     ICE all 保留直连候选，TURN 仅转发 WebRTC DTLS 加密后的数据。 */
-  const TURN_KEY='tjphub_drop_turn_settings';
-  const validateTurn=value=>{
-    if(!value||!Array.isArray(value.u)||!value.u.length||value.u.length>3||typeof value.n!=='string'||typeof value.p!=='string'||!value.n.trim()||!value.p||value.n.length>128||value.p.length>128)throw new Error('请填写 TURN 地址、用户名和访问密码');
-    const urls=[...new Set(value.u.map(url=>String(url).trim()))];
-    for(const url of urls){const m=/^turns?:([a-z0-9.-]+|\[[a-f0-9:]+\])(?::(\d{1,5}))?(?:\?transport=(udp|tcp))?$/i.exec(url);if(!m||(m[2]&&(+m[2]<1||+m[2]>65535))||(/^turns:/i.test(url)&&m[3]==='udp'))throw new Error('TURN 地址格式不正确，请使用 turn: 或 turns:');}
-    if(urls.join('\n').length>280)throw new Error('中继地址过长，请精简为必要的服务器地址');
-    return {u:urls,n:value.n.trim(),p:value.p};
-  };
-  const readTurn=()=>{try{const saved=localStorage.getItem(TURN_KEY);return saved?validateTurn(JSON.parse(saved)):null;}catch(_){return null;}};
-  const encodeTurn=config=>btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(config)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-  const decodeTurn=value=>{if(!value)return null;if(value.length>1600||!/^[a-zA-Z0-9_-]+$/.test(value))throw new Error('中继配对配置无效，请重新扫码');return validateTurn(JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(value.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)))));};
-  const peerOptions=config=>({host:'0.peerjs.com',port:443,path:'/',secure:true,debug:1,pingInterval:10000,config:{iceServers:[
-    {urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},
-    ...(config?[{urls:config.u,username:config.n,credential:config.p}]:[])
-  ],iceTransportPolicy:'all',iceCandidatePoolSize:10}});
-  let activeTurn=null;
-  const routeHint=()=>{$(mobile?'dropP2pMobileRoute':'dropP2pHostRoute').textContent=activeTurn?'已配置中继兜底，正在尝试可用链路':'未配置中继，仅尝试 P2P 直连';};
+  const MAGIC = 0x544a5031, PROTOCOL = 'tjp-drop-2', MAX_RELAY = 20 * 1024 * 1024;
+  const peerOptions=()=>({host:'0.peerjs.com',port:443,path:'/',secure:true,debug:0,pingInterval:10000,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}],iceTransportPolicy:'all'}});
+  const ioId=(phone,desktop)=>mobile?phone:desktop;
+  const statusId=()=>ioId('dropP2pMobileStatus','dropP2pHostStatus');
+  const progressId=()=>ioId('dropP2pMobileProgress','dropP2pHostProgress');
+  const routeHint=()=>{$(ioId('dropP2pMobileRoute','dropP2pHostRoute')).textContent='直连优先，连接受阻时自动尝试加密转发';};
   const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const randomHex = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), n => n.toString(16).padStart(2,'0')).join('');
+  // 信令只携带独立域的认证摘要，不把转发加密密钥交给 PeerJS Broker。
+  const pairingProof=async(key,id)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('tjp-peer-auth:'+id+':'+key))),n=>n.toString(16).padStart(2,'0')).join('');
   const sizeLabel = n => n < 1024 ? n + ' B' : n < 1048576 ? (n/1024).toFixed(1)+' KB' : n < 1073741824 ? (n/1048576).toFixed(1)+' MB' : (n/1073741824).toFixed(2)+' GB';
   const cleanName = name => String(name || '接收文件').split(/[\\/]/).pop().replace(/[\x00-\x1f\x7f]/g,'').slice(0,180) || '接收文件';
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
   const status = (id, text, state='waiting') => { const el=$(id); el.dataset.state=state; el.lastElementChild.textContent=text; };
-  const feedback = (text, error=false) => { $('dropP2pFeedback').textContent=text; $('dropP2pFeedback').classList.toggle('error',error); };
+  const feedback = (text, error=false) => { const el=$(ioId('dropP2pFeedback','dropP2pHostFeedback'));el.textContent=text;el.classList.toggle('error',error); };
   const progress = (id, value, name, detail) => {
     const el=$(id), pct=Math.max(0,Math.min(100,Math.round(value)));
     el.hidden=false; el.querySelector('.fill').style.strokeDashoffset=String(125.664*(1-pct/100));
@@ -5135,43 +5129,57 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   const control=(connection,message)=>{if(!connection?.open)throw new Error('设备连接已断开');connection.send(JSON.stringify(message));};
   const parseControl=data=>{if(typeof data!=='string'||data.length>8192)throw new Error('无效控制消息');const message=JSON.parse(data);if(!message||typeof message.t!=='string')throw new Error('无效控制消息');return message;};
   let peer=null, connection=null, generation=0, session='', pairKey='', ready=false, busy=false, activeSend=null;
+  let relayBridge=null, hostDocuments=[];
   let signalRetryTimer=0, signalRetryAttempts=0;
   let photos=[], documents=[], receiver=null, receiveChain=Promise.resolve(), receiveTimer;
   const pending=new Map();
   const rejectPending=error=>{pending.forEach(entry=>{clearTimeout(entry.timer);entry.reject(error);});pending.clear();};
   const waitAck=(type,id)=>{const promise=new Promise((resolve,reject)=>{const key=type+':'+id;const timer=setTimeout(()=>{pending.delete(key);reject(new Error('接收确认超时，请检查电脑端是否仍打开'));},60000);pending.set(key,{resolve,reject,timer});});promise.catch(()=>{});return promise;};
   const acceptAck=message=>{const entry=pending.get(message.t+':'+message.id);if(entry){clearTimeout(entry.timer);pending.delete(message.t+':'+message.id);entry.resolve(message);}};
-  const updateSendButtons=()=>{document.querySelectorAll('[data-p2p-send]').forEach(btn=>{const has=btn.id==='dropP2pSendText'?!!$('dropP2pText').value.trim():btn.id==='dropP2pSendPhotos'?photos.length>0:documents.length>0;btn.disabled=!ready||busy||!has;});$('dropP2pCancel').disabled=!busy;};
+  const updateSendButtons=()=>{document.querySelectorAll('[data-p2p-send]').forEach(btn=>{const has=btn.id==='dropP2pSendText'?!!$('dropP2pText').value.trim():btn.id==='dropP2pSendPhotos'?photos.length>0:btn.id==='dropP2pHostSendText'?!!$('dropP2pHostText').value.trim():btn.id==='dropP2pHostSendFiles'?hostDocuments.length>0:documents.length>0;btn.disabled=!ready||busy||!has;});$(ioId('dropP2pCancel','dropP2pHostCancel')).disabled=!busy;if(!mobile){$('dropP2pHostSend').hidden=!ready;$('dropP2pQr').classList.toggle('paired',ready);}};
   const resetReceiver=()=>{clearTimeout(receiveTimer);receiver=null;};
-  const armReceiveTimeout=()=>{clearTimeout(receiveTimer);receiveTimer=setTimeout(()=>{const id=receiver?.id;resetReceiver();if(connection?.open)control(connection,{t:'error',id,message:'接收超时，未保存不完整文件'});status('dropP2pHostStatus','接收超时，可重新发送','error');},120000);};
+  const armReceiveTimeout=()=>{clearTimeout(receiveTimer);receiveTimer=setTimeout(()=>{const id=receiver?.id;resetReceiver();if(connection?.open)control(connection,{t:'error',id,message:'接收超时，未保存不完整文件'});status(statusId(),'接收超时，可重新发送','error');},120000);};
   const speedText=(bytes,start)=>sizeLabel(bytes/Math.max(0.1,(performance.now()-start)/1000))+'/s';
-  const failureText=error=>({ 'peer-unavailable':'未找到电脑会话，请重新扫码', 'network':'无法连接公共信令，请检查网络', 'unavailable-id':'会话编号被占用，请重新配对', 'browser-incompatible':'当前浏览器不支持 WebRTC，请更新浏览器', 'webrtc':activeTurn?'连接失败，请检查网络与 TURN 地址、凭据是否有效':'直连受阻，请在电脑端配置可用中继后重新扫码', 'ssl-unavailable':'信令安全连接失败，请检查网络' }[error?.type]||error?.message||'连接失败，请重试');
+  const failureText=error=>({ 'peer-unavailable':'电脑的配对会话已失效，请重新扫码', 'network':'直连服务暂不可用，正在尝试加密转发', 'unavailable-id':'直连编号已被占用，仍可尝试加密转发', 'browser-incompatible':'浏览器无法直连，正在尝试加密转发', 'webrtc':'直连受阻，正在尝试加密转发', 'ssl-unavailable':'直连信令连接受阻，正在尝试加密转发' }[error?.type]||error?.message||'连接失败，请重试');
 
+  const mobileInbox=[];
+  function receiveOnMobile(record){
+    mobileInbox.unshift(record);while(mobileInbox.length>5){const old=mobileInbox.pop();if(old.url)URL.revokeObjectURL(old.url);}
+    const list=$('dropP2pInboxList');list.replaceChildren();
+    for(const item of mobileInbox){const row=document.createElement('article');row.className='drop-p2p-inbox-item';
+      if(item.kind==='text'){const pre=document.createElement('pre');pre.textContent=item.text;row.appendChild(pre);}
+      else{const title=document.createElement('strong');title.textContent=item.name;row.appendChild(title);const size=document.createElement('small');size.textContent=sizeLabel(item.size);row.appendChild(size);if(/^image\/(png|jpeg|gif|webp|avif)$/.test(item.mime)){const image=document.createElement('img');image.src=item.url;image.alt=item.name;row.appendChild(image);}}
+      const action=document.createElement('button');action.className='drop-p2p-btn';action.type='button';action.textContent=item.kind==='text'?'复制文本':'保存 / 分享';
+      action.addEventListener('click',async()=>{try{if(item.kind==='text'){if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(item.text);else{const helper=document.createElement('textarea');helper.value=item.text;row.appendChild(helper);helper.select();const copied=document.execCommand('copy');helper.remove();if(!copied)throw new Error('请长按上方文本复制');}action.textContent='已复制';setTimeout(()=>{action.textContent='复制文本';},1500);}
+        else{const file=new File([item.blob],item.name,{type:item.mime}),data={files:[file]};if(navigator.canShare?.(data)&&navigator.share)await navigator.share(data);else{startDownload(item.blob,item.name);feedback(/MicroMessenger/i.test(navigator.userAgent)?'微信可能限制保存，请在浏览器打开链接后保存':'已请求保存，请检查下载列表');}}}catch(error){if(error.name!=='AbortError')feedback(error.message||'保存受限，请在系统浏览器打开',true);}});row.appendChild(action);list.appendChild(row);
+    }
+  }
   async function receiveData(data, currentConnection) {
     if(currentConnection!==connection)return;
     if(typeof data==='string'){
       const m=parseControl(data);
-      if(m.t==='cancel'){resetReceiver();status('dropP2pHostStatus','手机已取消，可继续发送','connected');return;}
+      if(m.t==='cancel'){resetReceiver();status(statusId(),'对方已取消，可继续互传','connected');return;}
       if(m.t==='start'){
         if(receiver)throw new Error('上一份文件尚未接收完成');
         if(!/^[a-f0-9]{32}$/.test(m.id)||!['text','file'].includes(m.kind)||!Number.isSafeInteger(m.size)||m.size<0||m.size>(m.kind==='text'?MAX_TEXT:MAX_FILE))throw new Error('文件过大或元数据无效，单文件上限 1 GB');
+        if(currentConnection.transport==='relay'&&m.size>MAX_RELAY)throw new Error('公共加密转发单文件上限 20 MB');
         receiver={id:m.id,kind:m.kind,name:cleanName(m.name),mime:String(m.mime||'application/octet-stream').slice(0,120),size:m.size,bytes:0,sequence:0,crc:0xffffffff,chunks:[],start:performance.now()};
-        armReceiveTimeout();status('dropP2pHostStatus','正在接收手机推送','connected');progress('dropP2pHostProgress',0,receiver.name,'准备接收 '+sizeLabel(m.size));control(currentConnection,{t:'start-ok',id:m.id});return;
+        armReceiveTimeout();status(statusId(),'正在接收对方发送的内容','connected');progress(progressId(),0,receiver.name,'准备接收 '+sizeLabel(m.size));control(currentConnection,{t:'start-ok',id:m.id});return;
       }
       if(m.t==='end'){
         const r=receiver;if(!r||m.id!==r.id||r.bytes!==r.size||((r.crc^0xffffffff)>>>0)!==(m.crc>>>0))throw new Error('完整性校验失败，请重新发送');
         clearTimeout(receiveTimer);const blob=new Blob(r.chunks,{type:r.mime});let durable=true;
         if(r.kind==='text'){
           const text=new TextDecoder('utf-8',{fatal:true}).decode(await blob.arrayBuffer());
-          if(!text.trim()||!window.TJPDropTray?.addText(text))throw new Error('文本为空或本地存储已满，请清理后重发');
+          if(!text.trim())throw new Error('不能接收空白文本');
+          if(mobile){receiveOnMobile({kind:'text',text});durable=false;}else if(!window.TJPDropTray?.addText(text))throw new Error('本地存储已满，请清理后重发');
         }else{
-          if(!window.TJPDropTray)throw new Error('托盘未就绪，请刷新电脑页面');
-          durable=await window.TJPDropFiles.put({id:r.id,blob,name:r.name,size:r.size,mime:r.mime,time:Date.now()});
-          durable=window.TJPDropTray.addFile(r)&&durable;startDownload(blob,r.name);
+          if(mobile){receiveOnMobile({id:r.id,kind:'file',name:r.name,size:r.size,mime:r.mime,blob,url:URL.createObjectURL(blob)});durable=false;}
+          else{if(!window.TJPDropTray)throw new Error('托盘未就绪，请刷新电脑页面');durable=await window.TJPDropFiles.put({id:r.id,blob,name:r.name,size:r.size,mime:r.mime,time:Date.now()});durable=window.TJPDropTray.addFile(r)&&durable;startDownload(blob,r.name);}
         }
         if(currentConnection!==connection)return;
-        progress('dropP2pHostProgress',100,r.name,sizeLabel(r.size)+' · 已完整接收');
-        status('dropP2pHostStatus',r.kind==='text'?'文本已存入托盘，可继续发送':durable?'文件已缓存并请求下载，托盘可再次下载':'已请求下载；本地缓存不可用，仅本次页面可重下','connected');
+        progress(progressId(),100,r.name,sizeLabel(r.size)+' · 已完整接收');
+        status(statusId(),mobile?'已收到，请在下方收件箱复制或保存':r.kind==='text'?'文本已存入托盘，可继续互传':durable?'文件已缓存并请求下载':'已请求下载；本地缓存不可用，仅本次可重下','connected');
         resetReceiver();control(currentConnection,{t:'done',id:r.id,durable});return;
       }
       throw new Error('不兼容的控制消息');
@@ -5180,7 +5188,7 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
     const frame=readFrame(data),r=receiver;
     if(!r||frame.id!==r.id||frame.sequence!==r.sequence||!frame.payload.length||r.bytes+frame.payload.length>r.size)throw new Error('文件分块顺序或长度错误');
     r.chunks.push(frame.payload);r.bytes+=frame.payload.length;r.sequence++;r.crc=crcUpdate(r.crc,frame.payload);armReceiveTimeout();
-    progress('dropP2pHostProgress',r.size?r.bytes/r.size*100:100,r.name,sizeLabel(r.bytes)+' / '+sizeLabel(r.size)+' · '+speedText(r.bytes,r.start));
+    progress(progressId(),r.size?r.bytes/r.size*100:100,r.name,sizeLabel(r.bytes)+' / '+sizeLabel(r.size)+' · '+speedText(r.bytes,r.start));
     if(r.sequence%WINDOW===0||r.bytes===r.size)control(currentConnection,{t:'chunk-ok',id:r.id,bytes:r.bytes,sequence:r.sequence});
   }
   const guardSend=token=>{if(token.cancelled||connection!==token.connection||!connection?.open)throw new Error(token.cancelled?'传输已取消':'设备已断开，请重新连接');};
@@ -5190,33 +5198,92 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   async function sendBlob(blob, name, kind, token) {
     const id=randomHex();token.id=id;const current=token.connection;let crc=0xffffffff,sequence=0,offset=0;const start=performance.now();
     if(blob.size>(kind==='text'?MAX_TEXT:MAX_FILE))throw new Error(kind==='text'?'文本上限 8 MB':'单文件上限 1 GB，请拆分后发送');
+    if(current.transport==='relay'&&blob.size>MAX_RELAY)throw new Error('公共加密转发单文件上限 20 MB，请拆分或尝试同一 Wi-Fi 下直连');
     let ack=waitAck('start-ok',id);control(current,{t:'start',id,kind,name:cleanName(name),mime:blob.type||'application/octet-stream',size:blob.size});await ack;guardSend(token);
-    progress('dropP2pMobileProgress',0,name,'准备发送 '+sizeLabel(blob.size));
+    progress(progressId(),0,name,'准备发送 '+sizeLabel(blob.size));
     while(offset<blob.size){
       ack=waitAck('chunk-ok',id);
       for(let batch=0;batch<WINDOW&&offset<blob.size;batch++){
         guardSend(token);await waitBuffer(token);const buffer=await blob.slice(offset,offset+CHUNK).arrayBuffer();guardSend(token);
+        if(current.transport==='relay')await delay(125);guardSend(token);
         crc=crcUpdate(crc,new Uint8Array(buffer));current.send(makeFrame(id,sequence++,buffer));offset+=buffer.byteLength;
       }
       const result=await ack;guardSend(token);if(result.bytes!==offset||result.sequence!==sequence)throw new Error('接收确认不一致，请重新发送');
-      progress('dropP2pMobileProgress',blob.size?offset/blob.size*100:100,name,sizeLabel(offset)+' / '+sizeLabel(blob.size)+' · '+speedText(offset,start));
+      progress(progressId(),blob.size?offset/blob.size*100:100,name,sizeLabel(offset)+' / '+sizeLabel(blob.size)+' · '+speedText(offset,start));
     }
     ack=waitAck('done',id);control(current,{t:'end',id,crc:(crc^0xffffffff)>>>0});const done=await ack;guardSend(token);
-    progress('dropP2pMobileProgress',100,name,done.durable===false?'电脑已完整接收，缓存仅本次有效':'电脑已完整接收');return done;
+    progress(progressId(),100,name,done.durable===false?'对方已完整接收，请在接收端及时保存':'对方已完整接收并缓存');return done;
   }
   async function sendBatch(entries) {
     if(!ready||busy||!entries.length)return;
     const token={connection,cancelled:false,id:null};activeSend=token;busy=true;updateSendButtons();feedback('正在传输，请保持两端页面打开');
     let completed=0;
     try{for(const entry of entries){guardSend(token);await sendBlob(entry.blob,entry.name,entry.kind,token);completed++;}
-      if(entries[0].kind==='text')$('dropP2pText').value='';
-      feedback(entries[0].kind==='text'?'文本已到达电脑托盘':'已完整发送 '+completed+' 个文件；电脑端已请求下载');
+      if(entries[0].kind==='text')$(ioId('dropP2pText','dropP2pHostText')).value='';
+      feedback(entries[0].kind==='text'?(mobile?'文本已到达电脑托盘':'文本已到达手机收件箱'):'已送达 '+completed+' 个文件，对方可保存');
     }catch(error){if(connection?.open&&token.id)try{control(connection,{t:'cancel',id:token.id});}catch(_){}rejectPending(error);feedback((completed?'已完成 '+completed+' 个，其余未完成。':'')+failureText(error),true);
     }finally{busy=false;activeSend=null;updateSendButtons();}
   }
   const disconnectConnection=()=>{ready=false;if(activeSend)activeSend.cancelled=true;rejectPending(new Error('设备连接已结束'));resetReceiver();const old=connection;connection=null;old?.close();updateSendButtons();routeHint();};
-  const stopPeer=()=>{generation++;clearTimeout(signalRetryTimer);signalRetryTimer=0;signalRetryAttempts=0;disconnectConnection();peer?.destroy();peer=null;session='';};
+  const stopPeer=()=>{generation++;clearTimeout(signalRetryTimer);signalRetryTimer=0;signalRetryAttempts=0;disconnectConnection();relayBridge?.close();relayBridge=null;peer?.destroy();peer=null;session='';};
+  /* 免配置兜底：原生 MQTT 3.1.1 / WSS，公共 EMQX 服务仅接触 AES-GCM 密文。
+     只订阅本次随机密钥的哈希主题；不使用 retained / 持久会话。QoS1 + 收件 ACK
+     + CRC 保证缺包不会被误报成功。公共测试服务无可用性保证，不用于大批量分发。 */
+  const joinBytes=(...parts)=>{const result=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let offset=0;for(const part of parts){result.set(part,offset);offset+=part.length;}return result;};
+  const mqttString=text=>{const bytes=new TextEncoder().encode(text);return joinBytes(Uint8Array.of(bytes.length>>8,bytes.length&255),bytes);};
+  const mqttPacket=(type,body=new Uint8Array())=>{let size=body.length;const length=[];do{let byte=size%128;size=Math.floor(size/128);if(size)byte|=128;length.push(byte);}while(size);return joinBytes(Uint8Array.of(type,...length),body);};
+  const bytesB64=bytes=>btoa(String.fromCharCode(...bytes));
+  const fromB64=text=>Uint8Array.from(atob(text),c=>c.charCodeAt(0));
+  class EncryptedRelay {
+    constructor(options){Object.assign(this,options);this.id=randomHex();this.sequence=0;this.received=new Map();this.closed=false;this.available=false;this.tx=Promise.resolve();this.rx=Promise.resolve();this.queued=0;this.packetId=1;this.acks=new Map();this.retries=0;this.started=Date.now();this.init();}
+    async init(){try{const raw=Uint8Array.from(this.key.match(/../g),hex=>parseInt(hex,16));this.cryptoKey=await crypto.subtle.importKey('raw',raw,'AES-GCM',false,['encrypt','decrypt']);const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(this.session+':'+this.key)));this.root='tjp-drop/v2/'+Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');if(!this.closed)this.socket();}catch(_){this.onState('error','当前浏览器无法安全加密，请在系统浏览器中打开');}}
+    socket(){
+      this.buffer=new Uint8Array();this.available=false;const ws=this.ws=new WebSocket('wss://broker.emqx.io:8084/mqtt','mqtt');ws.binaryType='arraybuffer';
+      const timeout=setTimeout(()=>{if(!this.available&&ws===this.ws)ws.close();},12000);
+      ws.onopen=()=>ws.send(mqttPacket(0x10,joinBytes(mqttString('MQTT'),Uint8Array.of(4,2,0,30),mqttString('tjp-'+randomHex().slice(0,16)))));
+      ws.onmessage=event=>{this.rx=this.rx.then(async()=>{if(this.closed||ws!==this.ws)return;const bytes=event.data instanceof Blob?new Uint8Array(await event.data.arrayBuffer()):new Uint8Array(event.data);this.buffer=joinBytes(this.buffer,bytes);if(this.buffer.length>131072)throw new Error('转发消息过大');while(this.buffer.length>=2){let size=0,multiple=1,pos=1,byte;do{if(pos>=this.buffer.length)return;byte=this.buffer[pos++];size+=(byte&127)*multiple;multiple*=128;if(pos>5||size>65536)throw new Error('转发协议错误');}while(byte&128);if(this.buffer.length<pos+size)return;const type=this.buffer[0],body=this.buffer.slice(pos,pos+size);this.buffer=this.buffer.slice(pos+size);await this.packet(type,body);}}).catch(()=>ws.close());};
+      ws.onerror=()=>{};
+      ws.onclose=()=>{clearTimeout(timeout);if(ws!==this.ws)return;this.available=false;clearInterval(this.heartbeat);for(const pending of this.acks.values()){clearTimeout(pending.timer);pending.reject(new Error('转发连接断开'));}this.acks.clear();if(this.selected){const old=this.selected;this.selected=null;old.open=false;old.emit('close');}if(!this.closed){if(this.retries++<3)this.retry=setTimeout(()=>{if(!this.closed)this.socket();},this.retries*1500);else this.onState('error','加密转发暂不可用，请检查网络后重新连接');}};
+    }
+    async packet(type,body){
+      const ws=this.ws;
+      if(type===0x20){if(body.length!==2||body[1]!==0)throw new Error('转发服务拒绝连接');ws.send(mqttPacket(0x82,joinBytes(Uint8Array.of(0,1),mqttString(this.root+(this.host?'/host':'/mobile')),Uint8Array.of(1))));return;}
+      if(type===0x90){if(body.length!==3||body[0]!==0||body[1]!==1||body[2]>1)throw new Error('转发订阅失败');this.available=true;this.retries=0;this.onState('available');clearInterval(this.heartbeat);this.tick();this.heartbeat=setInterval(()=>this.tick(),8000);return;}
+      if(type===0x40){const id=(body[0]<<8)|body[1],ack=this.acks.get(id);if(ack){clearTimeout(ack.timer);this.acks.delete(id);ack.resolve();}return;}
+      if((type>>4)!==3)return;
+      const topicSize=(body[0]<<8)|body[1],topic=new TextDecoder().decode(body.subarray(2,2+topicSize));let pos=2+topicSize;const qos=(type>>1)&3;
+      if(qos===1){if(body.length<pos+2)return;ws.send(mqttPacket(0x40,body.slice(pos,pos+2)));pos+=2;}else if(qos!==0)throw new Error('不支持的转发服务协议');
+      if(topic!==this.root+(this.host?'/host':'/mobile'))return;
+      const payload=body.subarray(pos);if(payload.length<29)return;let message;
+      try{const clear=await crypto.subtle.decrypt({name:'AES-GCM',iv:payload.subarray(0,12),additionalData:new TextEncoder().encode(this.root)},this.cryptoKey,payload.subarray(12));message=JSON.parse(new TextDecoder().decode(clear));}catch(_){return;}
+      if(message.s!==this.session||message.role!==(this.host?'mobile':'host')||!/^[a-f0-9]{32}$/.test(message.from||'')||!Number.isSafeInteger(message.seq)||message.seq<=0||(message.to&&message.to!==this.id))return;
+      const previous=this.received.get(message.from)||0;if(message.seq<=previous)return;if(!this.received.has(message.from)&&this.received.size>=16)return;this.received.set(message.from,message.seq);
+      if(message.type==='hello'&&this.host){if(!this.selected){if(!this.canPair())return;this.pair(message.from);}if(this.selected.remote===message.from)this.publish('welcome',null,message.from);return;}
+      if(message.type==='welcome'&&!this.host&&!this.selected){if(!this.canPair())return;this.pair(message.from);return;}
+      if(!this.selected||message.from!==this.selected.remote)return;this.lastSeen=Date.now();
+      if(message.type==='bye'){const old=this.selected;this.selected=null;old.open=false;old.emit('close');return;}
+      if(message.type==='data'){const data=message.binary?fromB64(message.body).buffer:message.body;if(typeof data!=='string'&&!(data instanceof ArrayBuffer))return;this.selected.emit('data',data);}
+    }
+    tick(){if(this.closed||!this.available)return;if(this.ws.readyState===1)this.ws.send(mqttPacket(0xc0));if(this.selected){if(Date.now()-this.lastSeen>35000){const old=this.selected;this.selected=null;old.open=false;old.emit('close');}else this.publish('beat',null,this.selected.remote);}else if(!this.host&&Date.now()-this.started>=this.delay)this.publish('hello');}
+    pair(remote){const bridge=this,conn={transport:'relay',remote,open:false,callbacks:{},on(name,fn){(this.callbacks[name]??=[]).push(fn);},emit(name,value){for(const fn of this.callbacks[name]||[])fn(value);},send(data){if(!this.open)throw new Error('转发通道已关闭');bridge.publish('data',data,this.remote);},close(){if(!this.open)return;this.open=false;if(bridge.selected===this){bridge.publish('bye',null,this.remote);bridge.selected=null;}this.emit('close');}};conn.dataChannel={get bufferedAmount(){return bridge.queued+(bridge.ws?.bufferedAmount||0);}};this.selected=conn;this.lastSeen=Date.now();this.onPair(conn);queueMicrotask(()=>{if(this.selected===conn&&!this.closed){conn.open=true;conn.emit('open');}});}
+    publish(type,data=null,to=''){
+      if(!this.available||this.closed)return;const message={s:this.session,from:this.id,role:this.host?'host':'mobile',to,seq:++this.sequence,type,binary:data instanceof ArrayBuffer,body:data instanceof ArrayBuffer?bytesB64(new Uint8Array(data)):data};const plain=new TextEncoder().encode(JSON.stringify(message));this.queued+=plain.length;
+      this.tx=this.tx.catch(()=>{}).then(async()=>{if(!this.available||this.closed)return;const iv=crypto.getRandomValues(new Uint8Array(12)),cipher=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:new TextEncoder().encode(this.root)},this.cryptoKey,plain));const id=this.packetId=this.packetId%65535+1;const ack=new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.acks.delete(id);reject(new Error('转发确认超时'));},15000);this.acks.set(id,{resolve,reject,timer});});const topic=this.root+(this.host?'/mobile':'/host');this.ws.send(mqttPacket(0x32,joinBytes(mqttString(topic),Uint8Array.of(id>>8,id&255),iv,cipher)));await ack;}).catch(()=>{if(!this.closed)this.ws?.close();}).finally(()=>{this.queued-=plain.length;});
+    }
+    close(){if(this.closed||this.closing)return;this.closing=true;clearInterval(this.heartbeat);clearTimeout(this.retry);if(this.selected?.open)this.publish('bye',null,this.selected.remote);const finish=()=>{if(this.closed)return;this.closed=true;this.ws?.close();for(const ack of this.acks.values()){clearTimeout(ack.timer);ack.reject(new Error('会话已结束'));}this.acks.clear();};this.tx.finally(finish);setTimeout(finish,1500);}
+  }
+  function startRelay(isHost,gen,target,key){
+    if(!crypto.subtle||typeof WebSocket==='undefined'){status(statusId(),'请用支持安全加密的系统浏览器打开','error');return;}
+    relayBridge=new EncryptedRelay({host:isHost,session:target,key,delay:/MicroMessenger/i.test(navigator.userAgent)?0:4500,
+      canPair:()=>gen===generation&&!connection?.open,
+      onPair:conn=>{if(gen!==generation||connection?.open)return conn.close();if(connection)disconnectConnection();bindConnection(conn,isHost);},
+      onState:(state,message)=>{if(gen!==generation||ready)return;if(state==='available'){$(ioId('dropP2pMobileRoute','dropP2pHostRoute')).textContent='加密转发已就绪，无需设置';if(!isHost)relayBridge.tick();}else{status(statusId(),message,'error');}}
+    });
+    // 只给 P2P 一个短暂优先窗口；二维码不依赖 PeerJS Broker 成功注册。
+    if(!isHost)setTimeout(()=>{if(gen===generation&&!ready)relayBridge?.tick();},4700);
+  }
   const monitorConnection = (conn, isHost) => {
+    if(conn.transport==='relay'){conn.on('open',()=>{if(conn===connection)$(ioId('dropP2pMobileRoute','dropP2pHostRoute')).textContent='端到端加密转发 · 单文件 20 MB · 已限速';});return;}
     const setRouteStatus = async pc => {
       try {
         const stats = await pc.getStats(); let pair;
@@ -5243,16 +5310,17 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   function bindConnection(conn, isHost) {
     connection=conn;ready=false;receiveChain=Promise.resolve();monitorConnection(conn,isHost);conn.on('open',()=>{
       if(conn!==connection)return;
-      if(isHost){status('dropP2pHostStatus','已连接，正在识别传输链路','connected');control(conn,{t:'ready',protocol:PROTOCOL});}
+      if(isHost){ready=true;updateSendButtons();status('dropP2pHostStatus','手机已连接，可以双向互传','connected');control(conn,{t:'ready',protocol:PROTOCOL});}
       else status('dropP2pMobileStatus','已连接，正在确认传输通道');
     });
     conn.on('data',data=>{
       if(conn!==connection)return;
-      if(isHost){receiveChain=receiveChain.then(()=>receiveData(data,conn)).catch(error=>{if(conn!==connection)return;const id=receiver?.id;resetReceiver();if(conn.open)try{control(conn,{t:'error',id,message:failureText(error)});}catch(_){}status('dropP2pHostStatus',failureText(error),'error');});}
-      else{try{const message=parseControl(data);if(message.t==='ready'&&message.protocol===PROTOCOL){ready=true;status('dropP2pMobileStatus','已连接电脑，可以发送','connected');updateSendButtons();}
-        else if(message.t==='error'){rejectPending(new Error(message.message||'电脑接收失败'));feedback(message.message||'电脑接收失败',true);}
-        else acceptAck(message);
-      }catch(error){feedback(failureText(error),true);}}
+      if(typeof data==='string'){try{const message=parseControl(data);
+        if(message.t==='ready'){if(message.protocol!==PROTOCOL){feedback('两端页面版本不同，请刷新后重新扫码',true);return;}ready=true;status(statusId(),'已配对，可以双向互传','connected');updateSendButtons();return;}
+        if(message.t==='error'){rejectPending(new Error(message.message||'对方接收失败'));feedback(message.message||'对方接收失败',true);return;}
+        if(['start-ok','chunk-ok','done'].includes(message.t)){acceptAck(message);return;}
+      }catch(error){feedback(failureText(error),true);return;}}
+      receiveChain=receiveChain.then(()=>receiveData(data,conn)).catch(error=>{if(conn!==connection)return;const id=receiver?.id;resetReceiver();if(conn.open)try{control(conn,{t:'error',id,message:failureText(error)});}catch(_){}status(statusId(),failureText(error),'error');});
     });
     const closed=()=>{if(conn!==connection)return;disconnectConnection();status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',isHost?'手机已断开，原二维码可重新连接':'设备已断开，请点击重新连接','error');};
     conn.on('close',closed);conn.on('error',closed);
@@ -5260,53 +5328,54 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   }
   const bindPeerErrors=(instance, gen, isHost)=>{
     instance.on('open',()=>{ if(gen===generation){ clearTimeout(signalRetryTimer);signalRetryTimer=0;signalRetryAttempts=0; } });
-    instance.on('error',error=>{if(gen!==generation)return;status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',failureText(error),'error');if(!isHost){ready=false;updateSendButtons();feedback(failureText(error),true);}});
+    instance.on('error',error=>{if(gen!==generation||ready)return;status(statusId(),failureText(error),'waiting');relayBridge?.tick();});
     instance.on('disconnected',()=>{
       if(gen!==generation)return;
       if(connection?.open){ status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus','信令暂时断开，现有通道仍可传输','connected'); return; }
-      if(instance.destroyed || signalRetryAttempts >= 3){ status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus','信令断开，请点击重新配对或重新连接','error'); return; }
+      if(instance.destroyed || signalRetryAttempts >= 3){ relayBridge?.tick();return; }
       const attempt=++signalRetryAttempts, wait=attempt*1500;
       status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',`信令暂时断开，正在重连 ${attempt}/3…`,'waiting');
       clearTimeout(signalRetryTimer); signalRetryTimer=setTimeout(()=>{ if(gen===generation && instance.disconnected && !instance.destroyed) instance.reconnect(); },wait);
     });
   };
-  function pairingURL(turn=activeTurn) {
+  function pairingURL() {
     const manual=$('dropP2pAddress').value.trim();let url;
-    try{url=new URL(manual||location.href);}catch(_){throw new Error('请输入完整的手机可访问页面地址');}
-    if(!['http:','https:'].includes(url.protocol)||['localhost','127.0.0.1','[::1]'].includes(url.hostname)||!url.hostname)throw new Error('本地文件无法扫码访问，请填写手机可访问的同一 HTML 地址');
-    url.search='';url.hash='';url.searchParams.set('drop_peer',session);const fragment=new URLSearchParams({drop_key:pairKey});if(turn)fragment.set('drop_turn',encodeTurn(turn));url.hash=fragment.toString();return url.href;
+    try{url=new URL(manual||(location.protocol==='https:'?location.href:'https://tjp-userhub-kt9mdrpz.surge.sh/'));}catch(_){throw new Error('请输入完整的手机可访问页面地址');}
+    if(url.protocol!=='https:'||['localhost','127.0.0.1','[::1]'].includes(url.hostname)||!url.hostname)throw new Error('请使用手机可访问的 HTTPS 页面地址');
+    url.search='';url.hash='';url.searchParams.set('drop_peer',session);url.searchParams.set('drop_mode','v2');url.hash='drop_key='+pairKey;return url.href;
   }
   function renderPairing() {
     $('dropP2pSession').textContent=session?'会话 '+session:'正在创建临时会话';
     if(!session)return;
-    try{const url=pairingURL();$('dropP2pQr').innerHTML=qrSVG(url);$('dropP2pQr').title='使用手机原生相机扫码';$('dropP2pAddressShell').hidden=!$('dropP2pAddress').value.trim()&&!['file:'].includes(location.protocol)&&!['localhost','127.0.0.1','[::1]'].includes(location.hostname);}
-    catch(error){$('dropP2pQr').innerHTML='<span class="drop-p2p-qr-placeholder">无法生成配对码<br>请缩短地址或中继配置</span>';$('dropP2pAddressShell').hidden=false;status('dropP2pHostStatus',error.message,'error');}
+    try{const url=pairingURL();$('dropP2pQr').innerHTML=qrSVG(url);$('dropP2pQr').title='使用相机或微信扫一扫，打开链接配对';$('dropP2pAddressShell').hidden=true;}
+    catch(error){$('dropP2pQr').innerHTML='<span class="drop-p2p-qr-placeholder">请填写可访问的<br>HTTPS 页面地址</span>';$('dropP2pAddressShell').hidden=false;status('dropP2pHostStatus',error.message,'error');}
   }
   async function startHost() {
-    stopPeer();activeTurn=readTurn();routeHint();const gen=generation;pairKey=randomHex();$('dropP2pQr').innerHTML='<span class="drop-p2p-qr-placeholder">正在创建配对会话</span>';$('dropP2pHostProgress').hidden=true;status('dropP2pHostStatus','正在注册临时会话');
-    try{const Peer=await loadPeer();if(gen!==generation)return;const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',random=crypto.getRandomValues(new Uint8Array(6));session='tjp-'+Array.from(random,n=>alphabet[n%alphabet.length]).join('');peer=new Peer(session,peerOptions(activeTurn));const instance=peer;
-      bindPeerErrors(instance,gen,true);instance.on('open',()=>{if(gen!==generation)return;status('dropP2pHostStatus','等待扫码配对…');renderPairing();});
+    stopPeer();routeHint();const gen=generation;pairKey=randomHex();const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',random=crypto.getRandomValues(new Uint8Array(6));session='tjp-'+Array.from(random,n=>alphabet[n%alphabet.length]).join('');$('dropP2pHostProgress').hidden=true;status('dropP2pHostStatus','等待扫码配对…');renderPairing();startRelay(true,gen,session,pairKey);
+    try{const Peer=await loadPeer(),auth=await pairingProof(pairKey,session);if(gen!==generation||ready)return;peer=new Peer(session,peerOptions());const instance=peer;
+      bindPeerErrors(instance,gen,true);instance.on('open',()=>{if(gen!==generation||ready)return;status('dropP2pHostStatus','等待扫码配对…');});
       instance.on('connection',incoming=>{if(gen!==generation)return incoming.close();
-        if(incoming.metadata?.protocol!==PROTOCOL||incoming.metadata?.key!==pairKey||connection){incoming.on('open',()=>incoming.close());return;}
+        if(incoming.metadata?.protocol!==PROTOCOL||incoming.metadata?.auth!==auth||connection?.open){incoming.on('open',()=>incoming.close());return;}
+        if(connection)disconnectConnection();
         bindConnection(incoming,true);
       });
-      setTimeout(()=>{if(gen===generation&&peer&&!peer.open)status('dropP2pHostStatus','会话注册超时，请检查网络后重新配对','error');},45000);
-    }catch(error){if(gen===generation)status('dropP2pHostStatus',failureText(error),'error');}
+    }catch(error){if(gen===generation&&!ready)status('dropP2pHostStatus',relayBridge?.available?'直连暂不可用，仍可扫码使用加密转发':failureText(error),'waiting');}
   }
   async function startMobile() {
     stopPeer();const gen=generation;busy=false;updateSendButtons();const target=new URLSearchParams(location.search).get('drop_peer'),fragment=new URLSearchParams(location.hash.slice(1)),key=fragment.get('drop_key');
     if(!/^tjp-[a-z0-9]{6}$/.test(target||'')||! /^[a-f0-9]{32}$/.test(key||'')){status('dropP2pMobileStatus','配对链接不完整，请重新扫描电脑二维码','error');return;}
     status('dropP2pMobileStatus','正在连接电脑…');
-    try{activeTurn=decodeTurn(fragment.get('drop_turn'));routeHint();const Peer=await loadPeer();if(gen!==generation)return;peer=new Peer(undefined,peerOptions(activeTurn));const instance=peer;bindPeerErrors(instance,gen,false);
+    routeHint();startRelay(false,gen,target,key);
+    try{const Peer=await loadPeer(),auth=await pairingProof(key,target);if(gen!==generation||ready)return;peer=new Peer(undefined,peerOptions());const instance=peer;bindPeerErrors(instance,gen,false);
       instance.on('open',()=>{if(gen!==generation||connection)return;
         // PeerJS 1.5.5 的原始通道序列化名为 raw；none 不在该版本的构造器表中。
-        try{bindConnection(instance.connect(target,{serialization:'raw',reliable:true,metadata:{protocol:PROTOCOL,key}}),false);}
-        catch(error){status('dropP2pMobileStatus',failureText(error),'error');feedback(failureText(error),true);}
+        try{bindConnection(instance.connect(target,{serialization:'raw',reliable:true,metadata:{protocol:PROTOCOL,auth}}),false);}
+        catch(error){status('dropP2pMobileStatus',failureText(error),'waiting');relayBridge?.tick();}
       });
-      setTimeout(()=>{if(gen===generation&&!ready)status('dropP2pMobileStatus',activeTurn?'连接等待超时，请检查电脑在线及中继凭据有效性':'直连等待超时，请在电脑端配置中继后重新扫码','error');},45000);
-    }catch(error){if(gen===generation)status('dropP2pMobileStatus',failureText(error),'error');}
+    }catch(error){if(gen===generation&&!ready)status('dropP2pMobileStatus','直连暂不可用，正在尝试加密转发','waiting');}
+    setTimeout(()=>{if(gen===generation&&!ready)status('dropP2pMobileStatus','尚未连上：请确认电脑页面仍打开，或用系统浏览器重新扫描','error');},45000);
   }
-  function showHost() {$('dropP2pModal').classList.add('open');$('dropP2pModal').setAttribute('aria-hidden','false');$('dropP2pTrigger').setAttribute('aria-expanded','true');$('dropP2pClose').focus();if(!peer)startHost();}
+  function showHost() {$('dropP2pModal').classList.add('open');$('dropP2pModal').setAttribute('aria-hidden','false');$('dropP2pTrigger').setAttribute('aria-expanded','true');$('dropP2pClose').focus();if(!session)startHost();}
   function hideHost() {$('dropP2pModal').classList.remove('open');$('dropP2pModal').setAttribute('aria-hidden','true');$('dropP2pTrigger').setAttribute('aria-expanded','false');$('dropP2pTrigger').focus();}
   function selectTab(name) {
     for(const tab of ['Text','Photos','Files']){const active=name===tab,button=$('dropP2p'+tab+'Tab');button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;$('dropP2p'+tab+'Panel').hidden=!active;}
@@ -5332,18 +5401,12 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
     $('dropP2pCancel').addEventListener('click',()=>{if(activeSend){activeSend.cancelled=true;if(connection?.open&&activeSend.id)control(connection,{t:'cancel',id:activeSend.id});rejectPending(new Error('传输已取消'));}});
     $('dropP2pReconnect').addEventListener('click',()=>{if(!busy)startMobile();});startMobile();
   }else{
-    const savedTurn=readTurn();if(savedTurn){$('dropP2pTurnUrls').value=savedTurn.u.join('\n');$('dropP2pTurnUsername').value=savedTurn.n;$('dropP2pTurnCredential').value=savedTurn.p;}
-    $('dropP2pTurnSave').addEventListener('click',()=>{
-      if(receiver){status('dropP2pHostStatus','正在接收，请完成传输后再更改中继','error');return;}
-      try{const config=validateTurn({u:$('dropP2pTurnUrls').value.split(/[\n,]+/).filter(url=>url.trim()),n:$('dropP2pTurnUsername').value,p:$('dropP2pTurnCredential').value});
-        // 保存前校验二维码容量，不提交无效配置，也不将访问凭据写入公共文件。
-        if(session)qrSVG(pairingURL(config));localStorage.setItem(TURN_KEY,JSON.stringify(config));$('dropP2pTurnSettings').open=false;startHost();
-      }catch(error){status('dropP2pHostStatus',failureText(error),'error');}
-    });
-    $('dropP2pTurnClear').addEventListener('click',()=>{
-      if(receiver){status('dropP2pHostStatus','正在接收，请完成传输后再移除中继','error');return;}
-      try{localStorage.removeItem(TURN_KEY);for(const id of ['dropP2pTurnUrls','dropP2pTurnUsername','dropP2pTurnCredential'])$(id).value='';$('dropP2pTurnSettings').open=false;startHost();}catch(error){status('dropP2pHostStatus',failureText(error),'error');}
-    });
+    $('dropP2pHostText').addEventListener('input',updateSendButtons);
+    $('dropP2pHostSendText').addEventListener('click',()=>sendBatch([{blob:new Blob([$('dropP2pHostText').value],{type:'text/plain;charset=utf-8'}),name:'文本 / 代码',kind:'text'}]));
+    $('dropP2pHostPickFiles').addEventListener('click',()=>{if(!busy)$('dropP2pHostFilesInput').click();});
+    $('dropP2pHostFilesInput').addEventListener('change',event=>{if(!busy){hostDocuments=Array.from(event.target.files||[]);renderSelected('dropP2pHostFilesList',hostDocuments);}event.target.value='';});
+    $('dropP2pHostSendFiles').addEventListener('click',()=>sendBatch(hostDocuments.map(file=>({blob:file,name:file.name,kind:'file'}))));
+    $('dropP2pHostCancel').addEventListener('click',()=>{if(activeSend){activeSend.cancelled=true;if(connection?.open&&activeSend.id)control(connection,{t:'cancel',id:activeSend.id});rejectPending(new Error('传输已取消'));}});
     $('dropP2pTrigger').addEventListener('click',showHost);$('dropP2pClose').addEventListener('click',hideHost);
     // 模态内正常输入与滚动不冒泡给桌面翻页/快捷键；现有监听器无需改动。
     $('dropP2pModal').addEventListener('wheel',event=>event.stopPropagation(),{passive:true});
