@@ -2923,10 +2923,6 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
         结构：[{ id, name, url }]，顺序即展示顺序（可拖拽调整）
      ========================================================== */
   const FLAT_KEY = 'tjp_home_shortcuts';
-  const LEGACY_KEYS = [                                   // 旧版数据结构 → 平铺迁移，保留用户已有快捷方式
-    ['tjp_flat_shortcuts',   raw => Array.isArray(raw) ? raw.flatMap(g => (g && g.items) || []) : null],
-    ['tjp_bookmarks_vault',  raw => Array.isArray(raw && raw.folders) ? raw.folders.flatMap(f => f.items || []) : null],
-  ];
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   /* 补全协议头：无 scheme 时默认按 https:// 处理 */
   const normUrl = u => (u = u.trim(), /^[a-z][a-z0-9+.-]*:\/\//i.test(u) ? u : 'https://' + u);
@@ -3232,22 +3228,8 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
         return raw;
       }
     } catch (_) { /* 继续尝试旧版迁移 */ }
-    /* 旧版（文件夹结构）迁移：全部铺平，已固定到主页的排在前 */
-    for (const [key, pick] of LEGACY_KEYS) {
-      try {
-        const items = pick(JSON.parse(localStorage.getItem(key) || 'null'));
-        if (Array.isArray(items) && items.length) {
-          const pinnedFirst = [
-            ...items.filter(i => i.pinned),
-            ...items.filter(i => !i.pinned),
-          ].map(i => ({ id:uid(), name:String(i.name), url:String(i.url) }));
-          localStorage.setItem(FLAT_KEY, JSON.stringify(pinnedFirst));
-          return pinnedFirst;
-        }
-      } catch (_) { /* 单个旧键损坏不影响其余迁移 */ }
-    }
     const ds = defaultShortcuts();
-    localStorage.setItem(FLAT_KEY, JSON.stringify(ds));      // 首次加载：写入预设 8 项
+    localStorage.setItem(FLAT_KEY, JSON.stringify(ds));      // 首次加载：写入空白主页
     return ds;
   })();
   const saveShortcuts = () => localStorage.setItem(FLAT_KEY, JSON.stringify(shortcuts));
@@ -3831,18 +3813,36 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
         return raw;
       }
     } catch (_) { /* 数据损坏则重建默认库 */ }
-    try {
-      const legacy = JSON.parse(localStorage.getItem(LEGACY_VAULT_KEY) || 'null');
-      if (legacy && Array.isArray(legacy.folders)) {
-        localStorage.setItem(VAULT_KEY, JSON.stringify(legacy));
-        return legacy;
-      }
-    } catch (_) { /* 上一版数据损坏则建立默认库 */ }
     const dv = defaultVault();
     localStorage.setItem(VAULT_KEY, JSON.stringify(dv));
     return dv;
   })();
   const saveVault = () => localStorage.setItem(VAULT_KEY, JSON.stringify(vault));
+
+  /* 定制分发版绝不导入同设备的旧个人数据。
+     对早期线上版本自动写入的官方种子内容做一次精准迁移：只清理“完全等于旧预设”的数据，
+     不删除用户后来新增或修改过的任意链接。 */
+  const USER_EDITION_SEED_KEY = 'tjphub_user_edition_seed_v2';
+  const LEGACY_HOME_SEED = [
+    ['深技大教务','https://jwxt.sztu.edu.cn'], ['学生邮箱','https://mail.stumail.sztu.edu.cn'],
+    ['SZTU OJ','https://acm.sztu.edu.cn'], ['Google AI Studio','https://aistudio.google.com'],
+    ['ChatGPT','https://chatgpt.com'], ['Gemini','https://gemini.google.com'],
+    ['GitHub','https://github.com'], ['Hello 算法','https://www.hello-algo.com'],
+  ];
+  const LEGACY_CAMPUS_SEED = [
+    ['教务系统','https://jwxt.sztu.edu.cn'], ['学生邮箱','https://mail.stumail.sztu.edu.cn'],
+    ['SZTU OJ','https://acm.sztu.edu.cn'], ['图书馆','https://lib.sztu.edu.cn'], ['信息门户','https://i.sztu.edu.cn'],
+  ];
+  const sameSeed = (items, seed) => items.length === seed.length &&
+    seed.every(([name, url]) => items.some(item => item.name === name && normUrl(item.url) === normUrl(url)));
+  try {
+    if (localStorage.getItem(USER_EDITION_SEED_KEY) !== 'done') {
+      if (sameSeed(shortcuts, LEGACY_HOME_SEED)) { shortcuts = []; saveShortcuts(); }
+      const keptFolders = vault.folders.filter(folder => !(folder.name === '校园事务' && sameSeed(folder.items, LEGACY_CAMPUS_SEED)));
+      if (keptFolders.length !== vault.folders.length) { vault = { ...vault, folders:keptFolders }; saveVault(); }
+      localStorage.setItem(USER_EDITION_SEED_KEY, 'done');
+    }
+  } catch (_) { /* 受限存储模式下不影响当前页面正常使用 */ }
 
   const EDIT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4.5L20 8.5a2.12 2.12 0 0 0-3-3L5.5 17z"/><path d="m13.5 6.5 3 3"/></svg>';
   const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9.5 7V5.2A1.7 1.7 0 0 1 11.2 3.5h1.6a1.7 1.7 0 0 1 1.7 1.7V7M6.5 7l.9 12.1A1.9 1.9 0 0 0 9.3 21h5.4a1.9 1.9 0 0 0 1.9-1.9L17.5 7"/></svg>';
@@ -4975,7 +4975,10 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   const mobile = document.documentElement.classList.contains('drop-p2p-mobile-route');
   const CHUNK = 32768, WINDOW = 8, MAX_FILE = 1024 * 1024 * 1024, MAX_TEXT = 8 * 1024 * 1024;
   const MAGIC = 0x544a5031, PROTOCOL = 'tjp-drop-1';
-  const ICE = {iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}],iceTransportPolicy:'all'};
+  /* 明确使用 PeerJS Cloud 的安全信令端点；数据仍只走浏览器间 DataChannel。
+     ICE 只保留 STUN，故不会把文件回落经由 TURN 中继。 */
+  const ICE = {iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}],iceTransportPolicy:'all',iceCandidatePoolSize:10};
+  const PEER_OPTIONS = {host:'0.peerjs.com',port:443,path:'/',secure:true,debug:1,pingInterval:10000,config:ICE};
   const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const randomHex = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), n => n.toString(16).padStart(2,'0')).join('');
   const sizeLabel = n => n < 1024 ? n + ' B' : n < 1048576 ? (n/1024).toFixed(1)+' KB' : n < 1073741824 ? (n/1048576).toFixed(1)+' MB' : (n/1073741824).toFixed(2)+' GB';
@@ -5098,6 +5101,7 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   const control=(connection,message)=>{if(!connection?.open)throw new Error('设备连接已断开');connection.send(JSON.stringify(message));};
   const parseControl=data=>{if(typeof data!=='string'||data.length>8192)throw new Error('无效控制消息');const message=JSON.parse(data);if(!message||typeof message.t!=='string')throw new Error('无效控制消息');return message;};
   let peer=null, connection=null, generation=0, session='', pairKey='', ready=false, busy=false, activeSend=null;
+  let signalRetryTimer=0, signalRetryAttempts=0;
   let photos=[], documents=[], receiver=null, receiveChain=Promise.resolve(), receiveTimer;
   const pending=new Map();
   const rejectPending=error=>{pending.forEach(entry=>{clearTimeout(entry.timer);entry.reject(error);});pending.clear();};
@@ -5177,9 +5181,19 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
     }finally{busy=false;activeSend=null;updateSendButtons();}
   }
   const disconnectConnection=()=>{ready=false;if(activeSend)activeSend.cancelled=true;rejectPending(new Error('设备连接已结束'));resetReceiver();const old=connection;connection=null;old?.close();updateSendButtons();};
-  const stopPeer=()=>{generation++;disconnectConnection();peer?.destroy();peer=null;session='';};
+  const stopPeer=()=>{generation++;clearTimeout(signalRetryTimer);signalRetryTimer=0;signalRetryAttempts=0;disconnectConnection();peer?.destroy();peer=null;session='';};
+  const monitorConnection = (conn, isHost) => {
+    setTimeout(() => {
+      const pc = conn.peerConnection;
+      if (!pc || typeof pc.addEventListener !== 'function') return;
+      pc.addEventListener('iceconnectionstatechange', () => {
+        if (conn !== connection || pc.iceConnectionState !== 'failed') return;
+        status(isHost ? 'dropP2pHostStatus' : 'dropP2pMobileStatus', '局域网直连被当前网络阻止，请关闭 VPN 并连接同一 Wi‑Fi', 'error');
+      });
+    }, 0);
+  };
   function bindConnection(conn, isHost) {
-    connection=conn;ready=false;receiveChain=Promise.resolve();conn.on('open',()=>{
+    connection=conn;ready=false;receiveChain=Promise.resolve();monitorConnection(conn,isHost);conn.on('open',()=>{
       if(conn!==connection)return;
       if(isHost){status('dropP2pHostStatus','已连接手机设备，可直接推送','connected');control(conn,{t:'ready',protocol:PROTOCOL});}
       else status('dropP2pMobileStatus','已连接，正在确认传输通道');
@@ -5197,8 +5211,16 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
     setTimeout(()=>{if(conn===connection&&!conn.open){closed();}},30000);
   }
   const bindPeerErrors=(instance, gen, isHost)=>{
+    instance.on('open',()=>{ if(gen===generation){ clearTimeout(signalRetryTimer);signalRetryTimer=0;signalRetryAttempts=0; } });
     instance.on('error',error=>{if(gen!==generation)return;status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',failureText(error),'error');if(!isHost){ready=false;updateSendButtons();feedback(failureText(error),true);}});
-    instance.on('disconnected',()=>{if(gen!==generation)return;status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',connection?.open?'信令暂时断开，现有直连仍可传输':'信令已断开，请重试',connection?.open?'connected':'error');});
+    instance.on('disconnected',()=>{
+      if(gen!==generation)return;
+      if(connection?.open){ status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus','信令暂时断开，现有直连仍可传输','connected'); return; }
+      if(instance.destroyed || signalRetryAttempts >= 3){ status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus','信令断开，请点击重新配对或重新连接','error'); return; }
+      const attempt=++signalRetryAttempts, wait=attempt*1500;
+      status(isHost?'dropP2pHostStatus':'dropP2pMobileStatus',`信令暂时断开，正在重连 ${attempt}/3…`,'waiting');
+      clearTimeout(signalRetryTimer); signalRetryTimer=setTimeout(()=>{ if(gen===generation && instance.disconnected && !instance.destroyed) instance.reconnect(); },wait);
+    });
   };
   function pairingURL() {
     const manual=$('dropP2pAddress').value.trim();let url;
@@ -5214,22 +5236,22 @@ body .modal{ transition:transform .22s cubic-bezier(.34,1.4,.64,1),background .3
   }
   async function startHost() {
     stopPeer();const gen=generation;pairKey=randomHex();$('dropP2pQr').innerHTML='<span class="drop-p2p-qr-placeholder">正在创建配对会话</span>';$('dropP2pHostProgress').hidden=true;status('dropP2pHostStatus','正在注册临时会话');
-    try{const Peer=await loadPeer();if(gen!==generation)return;const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',random=crypto.getRandomValues(new Uint8Array(6));session='tjp-'+Array.from(random,n=>alphabet[n%alphabet.length]).join('');peer=new Peer(session,{secure:true,debug:0,config:ICE});const instance=peer;
+    try{const Peer=await loadPeer();if(gen!==generation)return;const alphabet='abcdefghijklmnopqrstuvwxyz0123456789',random=crypto.getRandomValues(new Uint8Array(6));session='tjp-'+Array.from(random,n=>alphabet[n%alphabet.length]).join('');peer=new Peer(session,PEER_OPTIONS);const instance=peer;
       bindPeerErrors(instance,gen,true);instance.on('open',()=>{if(gen!==generation)return;status('dropP2pHostStatus','等待扫码配对…');renderPairing();});
       instance.on('connection',incoming=>{if(gen!==generation)return incoming.close();
-        if(incoming.metadata?.protocol!==PROTOCOL||incoming.metadata?.key!==pairKey||incoming.serialization!=='none'||connection){incoming.on('open',()=>incoming.close());return;}
+        if(incoming.metadata?.protocol!==PROTOCOL||incoming.metadata?.key!==pairKey||connection){incoming.on('open',()=>incoming.close());return;}
         bindConnection(incoming,true);
       });
-      setTimeout(()=>{if(gen===generation&&peer&&!peer.open)status('dropP2pHostStatus','会话注册超时，请检查网络后重新配对','error');},30000);
+      setTimeout(()=>{if(gen===generation&&peer&&!peer.open)status('dropP2pHostStatus','会话注册超时，请检查网络后重新配对','error');},45000);
     }catch(error){if(gen===generation)status('dropP2pHostStatus',failureText(error),'error');}
   }
   async function startMobile() {
     stopPeer();const gen=generation;busy=false;updateSendButtons();const target=new URLSearchParams(location.search).get('drop_peer'),key=new URLSearchParams(location.hash.slice(1)).get('drop_key');
     if(!/^tjp-[a-z0-9]{6}$/.test(target||'')||! /^[a-f0-9]{32}$/.test(key||'')){status('dropP2pMobileStatus','配对链接不完整，请重新扫描电脑二维码','error');return;}
     status('dropP2pMobileStatus','正在连接电脑…');
-    try{const Peer=await loadPeer();if(gen!==generation)return;peer=new Peer({secure:true,debug:0,config:ICE});const instance=peer;bindPeerErrors(instance,gen,false);
+    try{const Peer=await loadPeer();if(gen!==generation)return;peer=new Peer(undefined,PEER_OPTIONS);const instance=peer;bindPeerErrors(instance,gen,false);
       instance.on('open',()=>{if(gen!==generation)return;bindConnection(instance.connect(target,{serialization:'none',reliable:true,metadata:{protocol:PROTOCOL,key}}),false);});
-      setTimeout(()=>{if(gen===generation&&!ready)status('dropP2pMobileStatus','直连等待超时，请确认电脑在线并检查局域网隔离','error');},30000);
+      setTimeout(()=>{if(gen===generation&&!ready)status('dropP2pMobileStatus','直连等待超时，请确认电脑在线、关闭 VPN，并检查局域网隔离','error');},45000);
     }catch(error){if(gen===generation)status('dropP2pMobileStatus',failureText(error),'error');}
   }
   function showHost() {$('dropP2pModal').classList.add('open');$('dropP2pModal').setAttribute('aria-hidden','false');$('dropP2pTrigger').setAttribute('aria-expanded','true');$('dropP2pClose').focus();if(!peer)startHost();}
